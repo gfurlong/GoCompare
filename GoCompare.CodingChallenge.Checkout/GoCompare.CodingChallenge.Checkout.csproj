@@ -39,11 +39,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasketList.cs" />
     <Compile Include="Checkout.cs" />
     <Compile Include="CheckoutException.cs" />
+    <Compile Include="CheckoutFactory.cs" />
     <Compile Include="ICheckout.cs" />
+    <Compile Include="ICheckoutFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sku.cs" />
+    <Compile Include="SkuDictionary.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
