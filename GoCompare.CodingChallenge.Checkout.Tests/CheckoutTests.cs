@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using Microsoft.QualityTools.Testing.Fakes;
+
+using GoCompare.CodingChallenge.Checkout.Offers;
 
 namespace GoCompare.CodingChallenge.Checkout.Tests
 {
@@ -19,8 +22,8 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         public void Setup()
         {
             _availableSkus = new SkuDictionary {
-                {'A', new Sku("Apple", 50m, 3, 130m)},
-                {'B', new Sku("Banana", 30m, 2, 45m)},
+                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
+                {'B', new Sku("Banana", 30m, new QtyBasedOffer(2, 45m))},
                 {'C', new Sku("Canteloupe", 20m)},
                 {'D', new Sku("Damson", 15m)}
             };
@@ -61,9 +64,9 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         [TestCase("", 0)]
         [TestCase("A", 50)]            // 1 individual
         [TestCase("AB", 80)]           // 2 individuals
-        [TestCase("CDBA", 115)]        // 4 individuals
-        [TestCase("AA", 100)]          // 1 offer
-        [TestCase("AAA", 130)]         // 1 offer and 1 individual
+        [TestCase("CDBA", 115)]        // 4 individuals (no offer)
+        [TestCase("AA", 100)]          // 2 individuals @ £50 (no offer)
+        [TestCase("AAA", 130)]         // 1 offer
         [TestCase("AAABB", 175)]       // 2 offers 
         [TestCase("AAABBAA", 275)]     // 3 offers and 1 individual
         [TestCase("AAABBBBBAA", 350)]  // 3 offers and >1 individual
@@ -75,6 +78,35 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
 
             Assert.That(expectedTotalPrice, Is.EqualTo(checkout.TotalPrice()));
         }
+
+        [Test]
+        [TestCase("", 0)]
+        [TestCase("AAA", 130)]         // 1 offer
+        [TestCase("AAABB", 160)]       // 2 offers, 1 @ 3 for £130, 1 time-based for £15 for each item (£30) = £160 total
+        [TestCase("AAABBAA", 260)]     // 2 offers and 2 individuals
+        [TestCase("AAABBBBBAA", 305)]  // 3 offers and >1 individual
+        public void CheckoutTotalPriceCalculationWithMixedOffersTest(string skuIds, decimal expectedTotalPrice)
+        {
+            var start = new DateTime(2017, 2, 7);
+            var end   = new DateTime(2017, 2, 9);
+
+            var availableSkus = new SkuDictionary {
+                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
+                {'B', new Sku("Banana", 30m, new TimeSensitiveOffer(15m, start, end))}
+            };
+
+            using (ShimsContext.Create())
+            {
+                System.Fakes.ShimDateTime.NowGet = () => { return new DateTime(2017, 2, 8); };
+
+                var checkout = _factory.Create(availableSkus);
+
+                checkout.AddRangeOfItemsToBasket(skuIds);
+
+                Assert.That(expectedTotalPrice, Is.EqualTo(checkout.TotalPrice()));
+            }
+        }
+
 
         [Test]
         public void ExceptionThrownIfInvalidSkuSuppliedWhenGettingDetailsTest()

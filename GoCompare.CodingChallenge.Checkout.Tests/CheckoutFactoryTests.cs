@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 
+using GoCompare.CodingChallenge.Checkout.Offers;
+
 namespace GoCompare.CodingChallenge.Checkout.Tests
 {
     /// <summary>
@@ -32,8 +34,8 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         public void CreateReturnsAnInstanceTest()
         {
             var checkout = _factory.Create(new SkuDictionary() {
-                { 'A', new Sku("Item A", 10m, 2, 15m)},
-                { 'B', new Sku("Item B", 2m)}
+                {'A', new Sku("Item A", 10m, new QtyBasedOffer(2, 15m))},
+                {'B', new Sku("Item B", 2m)}
             } );
 
             Assert.NotNull(checkout);

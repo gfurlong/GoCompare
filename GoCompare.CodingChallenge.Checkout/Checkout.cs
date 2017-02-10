@@ -111,18 +111,10 @@ namespace GoCompare.CodingChallenge.Checkout
                 var sku = _skus[skuId];
 
                 // If the item has an offer, check if there's enough of the same SKU to qualify...
-                if (sku.OfferQty > 0)
-                {
-                    var qtyApplicableForAnOffer = (int)(qty / sku.OfferQty);
-                    var remainders = (qty % sku.OfferQty);
-
-                    totalPrice += (qtyApplicableForAnOffer * sku.OfferPrice);
-                    totalPrice += (remainders * sku.IndividualPrice);
-                }
+                if (sku.Offer == null)
+                    totalPrice += (qty * sku.IndividualPrice);
                 else
-                {
-                    totalPrice += sku.IndividualPrice;
-                }
+                    totalPrice += sku.Offer.OfferPrice(qty, sku.IndividualPrice);
             }
 
             return totalPrice;

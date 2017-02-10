@@ -41,8 +41,8 @@ namespace GoCompare.CodingChallenge.Checkout.ConsoleApp
                 Console.WriteLine("{0} {1} {2,15:£0.00}  {3,8}",
                     basketItem.Value.ToString().PadLeft(5),
                     sku.Description.PadRight(20), sku.IndividualPrice, 
-                    (sku.OfferQty > 0) 
-                        ? string.Format("{0} for {1:£0.00}", sku.OfferQty, sku.OfferPrice)
+                    (sku.Offer != null) 
+                        ? sku.Offer.ToString()
                         : "");
             };
 

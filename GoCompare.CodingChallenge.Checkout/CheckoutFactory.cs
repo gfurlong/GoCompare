@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GoCompare.CodingChallenge.Checkout.Offers;
 
 namespace GoCompare.CodingChallenge.Checkout
 {
@@ -21,8 +22,8 @@ namespace GoCompare.CodingChallenge.Checkout
         public ICheckout Create()
         {
             return new Checkout(new SkuDictionary {
-                {'A', new Sku("Apple", 50m, 3, 130m)},
-                {'B', new Sku("Banana", 30m, 2, 45m)},
+                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
+                {'B', new Sku("Banana", 30m, new QtyBasedOffer(2, 45m))},
                 {'C', new Sku("Canteloupe", 20m)},
                 {'D', new Sku("Damson", 15m)}
             });
