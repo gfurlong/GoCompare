@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OfferTests.cs" />
     <Compile Include="CheckoutFactoryTests.cs" />
     <Compile Include="CheckoutTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

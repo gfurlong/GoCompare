@@ -42,7 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasketList.cs" />
+    <Compile Include="OfferDictionary.cs" />
+    <Compile Include="BasketDictionary.cs" />
     <Compile Include="Checkout.cs" />
     <Compile Include="CheckoutException.cs" />
     <Compile Include="CheckoutFactory.cs" />

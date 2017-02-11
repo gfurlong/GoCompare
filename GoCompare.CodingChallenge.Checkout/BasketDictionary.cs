@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace GoCompare.CodingChallenge.Checkout
 {
-    public class BasketList : SortedDictionary<char, int>
+    /// <summary>
+    /// A dictionary of basket items used in the checkout.
+    /// </summary>
+    public class BasketDictionary : SortedDictionary<char, int>
     {
     }
 }

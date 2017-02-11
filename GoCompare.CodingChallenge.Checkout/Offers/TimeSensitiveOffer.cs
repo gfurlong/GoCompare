@@ -43,7 +43,7 @@ namespace GoCompare.CodingChallenge.Checkout.Offers
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{0:£0.00} if bought between {1:dd MMM yyyy} and {2:dd MMM yyyy}", Price, Start, End);
+            return string.Format("{0:£0.00} from {1:dd MMM yyyy} to {2:dd MMM yyyy}", Price, Start, End);
         }
     }
 }

@@ -16,27 +16,14 @@ namespace GoCompare.CodingChallenge.Checkout
     public class CheckoutFactory : ICheckoutFactory
     {
         /// <summary>
-        /// Create a Checkout instance with the default list of available SKUs.
-        /// </summary>
-        /// <returns></returns>
-        public ICheckout Create()
-        {
-            return new Checkout(new SkuDictionary {
-                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
-                {'B', new Sku("Banana", 30m, new QtyBasedOffer(2, 45m))},
-                {'C', new Sku("Canteloupe", 20m)},
-                {'D', new Sku("Damson", 15m)}
-            });
-        }
-
-        /// <summary>
-        /// Create a Checkout instance with a custom list of available SKUs.
+        /// Create a Checkout instance with a custom list of available SKUs and offers.
         /// </summary>
         /// <param name="skus">A dictionary of available SKU IDs and their associated details</param>
+        /// <param name="offers">A dictionary of offers</param>
         /// <returns></returns>
-        public ICheckout Create(SkuDictionary skus)
+        public Checkout Create(SkuDictionary skus, OfferDictionary offers)
         {
-            return new Checkout(skus);
+            return new Checkout(skus, offers);
         }
     }
 }

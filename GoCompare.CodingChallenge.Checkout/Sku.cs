@@ -1,6 +1,4 @@
-﻿using GoCompare.CodingChallenge.Checkout.Offers;
-
-namespace GoCompare.CodingChallenge.Checkout
+﻿namespace GoCompare.CodingChallenge.Checkout
 {
     /// <summary>
     /// Stock Keeping Unit (SKU)
@@ -13,13 +11,10 @@ namespace GoCompare.CodingChallenge.Checkout
         /// <param name="skuId">SKU ID code</param>
         /// <param name="description">Description of the SKU</param>
         /// <param name="individualPrice">Pricate of the SKU if not part of an offer</param>
-        /// <param name="offer">If the SKU has an offer, set this parameter, otherwise leave it null</param>
-        public Sku(string description, decimal individualPrice, IOffer offer = null)
+        public Sku(string description, decimal price)
         {
             Description = description;
-            IndividualPrice = individualPrice;
-
-            Offer = offer;
+            Price = price;
         }
 
         /// <summary>
@@ -30,11 +25,6 @@ namespace GoCompare.CodingChallenge.Checkout
         /// <summary>
         /// The individual price of the SKU (non-offer value)
         /// </summary>
-        public decimal IndividualPrice;
-
-        /// <summary>
-        /// The current offer on the SKU item.
-        /// </summary>
-        public IOffer Offer;
+        public decimal Price;
     }
 }

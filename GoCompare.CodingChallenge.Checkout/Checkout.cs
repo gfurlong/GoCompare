@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
+using GoCompare.CodingChallenge.Checkout.Offers;
+
 namespace GoCompare.CodingChallenge.Checkout
 {
     /// <summary>
@@ -15,13 +17,14 @@ namespace GoCompare.CodingChallenge.Checkout
     public sealed class Checkout : ICheckout
     {
         private SkuDictionary _skus;
-        private BasketList _basket; 
+        private OfferDictionary _offers;
+        private BasketDictionary _basket; 
 
         /// <summary>
         /// The current basket as a dictionary of SKU codes with a running total of items (on offer and not on offer) added per SKU code.
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public BasketList Basket
+        public BasketDictionary Basket
         {
             get
             {
@@ -30,33 +33,41 @@ namespace GoCompare.CodingChallenge.Checkout
         }
 
         /// <summary>
-        /// Default constructor
-        /// </summary>
-        public Checkout() {
-            _skus = new SkuDictionary();
-            _basket = new BasketList();
-        }
-
-        /// <summary>
         /// Secondary constructor for supplying a non-default list of available SKUs
         /// </summary>
         /// <param name="skus"></param>
-        public Checkout(SkuDictionary skus) : this()
+        public Checkout(SkuDictionary skus, OfferDictionary offers)
         {
             _skus = skus;
+            _offers = offers;
+
+            _basket = new BasketDictionary();
         }
 
         /// <summary>
         /// Lookup the details of an item by its SKU ID code.
         /// </summary>
         /// <param name="skuId"></param>
-        /// <returns>A formatted string containing the details of the SKU item.</returns>
+        /// <returns>A SKU object.</returns>
         public Sku GetSkuDetails(char skuId)
         {
             if (!_skus.ContainsKey(skuId))
                 throw new ArgumentException(string.Concat("Missing or invalid SKU ID: ", skuId));
 
             return _skus[skuId];
+        }
+
+        /// <summary>
+        /// Lookup the details of an offer by its SKU ID code.
+        /// </summary>
+        /// <param name="skuId"></param>
+        /// <returns>An offer object or null if the offer doesn't exist.</returns>
+        public IOffer GetOfferDetails(char skuId)
+        {
+            if (!_offers.ContainsKey(skuId))
+                return null;
+
+            return _offers[skuId];
         }
 
         /// <summary>
@@ -111,10 +122,14 @@ namespace GoCompare.CodingChallenge.Checkout
                 var sku = _skus[skuId];
 
                 // If the item has an offer, check if there's enough of the same SKU to qualify...
-                if (sku.Offer == null)
-                    totalPrice += (qty * sku.IndividualPrice);
+                if (_offers.ContainsKey(skuId))
+                {
+                    totalPrice += _offers[skuId].OfferPrice(qty, sku.Price);
+                }
                 else
-                    totalPrice += sku.Offer.OfferPrice(qty, sku.IndividualPrice);
+                {
+                    totalPrice += (qty * sku.Price);
+                }
             }
 
             return totalPrice;

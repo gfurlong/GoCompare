@@ -22,21 +22,17 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         }
 
         [Test]
-        public void DefaultCreateReturnsAnInstanceTest()
-        {
-            var checkout = _factory.Create();
-
-            Assert.NotNull(checkout);
-            Assert.IsInstanceOf<Checkout>(checkout);
-        }
-
-        [Test]
         public void CreateReturnsAnInstanceTest()
         {
-            var checkout = _factory.Create(new SkuDictionary() {
-                {'A', new Sku("Item A", 10m, new QtyBasedOffer(2, 15m))},
-                {'B', new Sku("Item B", 2m)}
-            } );
+            var checkout = _factory.Create(
+                new SkuDictionary() {
+                    {'A', new Sku("Item A", 10m)},
+                    {'B', new Sku("Item B", 2m)}
+                },
+                new OfferDictionary() {
+                    {'A', new QtyBasedOffer(2, 15m)}
+                }
+            );
 
             Assert.NotNull(checkout);
             Assert.IsInstanceOf<Checkout>(checkout);

@@ -16,23 +16,29 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
     public class CheckoutTests
     {
         private SkuDictionary _availableSkus;
+        private OfferDictionary _offers;
         private ICheckoutFactory _factory = new CheckoutFactory();
 
         [SetUp]
         public void Setup()
         {
             _availableSkus = new SkuDictionary {
-                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
-                {'B', new Sku("Banana", 30m, new QtyBasedOffer(2, 45m))},
+                {'A', new Sku("Apple", 50m)},
+                {'B', new Sku("Banana", 30m)},
                 {'C', new Sku("Canteloupe", 20m)},
                 {'D', new Sku("Damson", 15m)}
+            };
+
+            _offers = new OfferDictionary {
+                {'A', new QtyBasedOffer(3, 130m)},
+                {'B', new QtyBasedOffer(2, 45m)}
             };
         }
 
         [Test]
         public void CheckoutTotalPriceOnAddingNewItemsTest()
         {
-            var checkout = _factory.Create(_availableSkus);
+            var checkout = _factory.Create(_availableSkus, _offers);
 
             checkout.AddItemToBasket('A');
             Assert.That(50, Is.EqualTo(checkout.TotalPrice()));
@@ -55,7 +61,7 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
 
         public void ExceptionThrownOnAddingInvalidNewItemTest(char skuId, decimal expectedTotalPrice)
         {
-            var checkout = _factory.Create(_availableSkus);
+            var checkout = _factory.Create(_availableSkus, _offers);
 
             Assert.Throws<CheckoutException>(() => checkout.AddItemToBasket(' '));
         }
@@ -72,7 +78,7 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         [TestCase("AAABBBBBAA", 350)]  // 3 offers and >1 individual
         public void CheckoutTotalPriceCalculationTest(string skuIds, decimal expectedTotalPrice)
         {
-            var checkout = _factory.Create(_availableSkus);
+            var checkout = _factory.Create(_availableSkus, _offers);
             
             checkout.AddRangeOfItemsToBasket(skuIds);
 
@@ -91,15 +97,20 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
             var end   = new DateTime(2017, 2, 9);
 
             var availableSkus = new SkuDictionary {
-                {'A', new Sku("Apple", 50m, new QtyBasedOffer(3, 130m))},
-                {'B', new Sku("Banana", 30m, new TimeSensitiveOffer(15m, start, end))}
+                {'A', new Sku("Apple", 50m)},
+                {'B', new Sku("Banana", 30m)}
+            };
+
+            var offers = new OfferDictionary { 
+                {'A', new QtyBasedOffer(3, 130m)},
+                {'B', new TimeSensitiveOffer(15m, start, end)}            
             };
 
             using (ShimsContext.Create())
             {
                 System.Fakes.ShimDateTime.NowGet = () => { return new DateTime(2017, 2, 8); };
 
-                var checkout = _factory.Create(availableSkus);
+                var checkout = _factory.Create(availableSkus, offers);
 
                 checkout.AddRangeOfItemsToBasket(skuIds);
 
@@ -111,9 +122,28 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         [Test]
         public void ExceptionThrownIfInvalidSkuSuppliedWhenGettingDetailsTest()
         {
-            var checkout = _factory.Create(_availableSkus);
+            var checkout = _factory.Create(_availableSkus, _offers);
 
             Assert.Throws<ArgumentException>(() => checkout.GetSkuDetails('~'), "Missing or invalid SKU ID: ~");
+        }
+
+        [Test]
+        public void ReturnNullIfInvalidSkuSuppliedWhenGettingOfferDetailsTest()
+        {
+            var checkout = _factory.Create(_availableSkus, _offers);
+
+            Assert.IsNull(checkout.GetOfferDetails('~'));
+        }
+
+        [Test]
+        public void ReturnOfferIfValidSkuSuppliedWhenGettingOfferDetailsTest()
+        {
+            var checkout = _factory.Create(_availableSkus, _offers);
+
+            var offer = (QtyBasedOffer) checkout.GetOfferDetails('A');
+            Assert.IsNotNull(offer);
+            Assert.AreEqual(3, offer.Qty);
+            Assert.AreEqual(130m, offer.Price);
         }
 
         [Test]
@@ -121,7 +151,7 @@ namespace GoCompare.CodingChallenge.Checkout.Tests
         {
             const string skuIds = "ABC~~~DEF"; // ( "~" is an invalid SKU code )
 
-            var checkout = _factory.Create(_availableSkus);
+            var checkout = _factory.Create(_availableSkus, _offers);
 
             Assert.Throws<CheckoutException>(() => checkout.AddRangeOfItemsToBasket(skuIds), "Invalid SKU ID: ~");
         }
